@@ -1,4 +1,3 @@
-// SearchPage.jsx
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaSearch, FaDownload } from 'react-icons/fa';
@@ -64,8 +63,7 @@ function SearchPage({ setSelectedImage }) {
   return (
     <div className="search-page">
       <header className="search-header">
-        <h1> Image Search & Editor</h1>
-
+        <h1>Image Search & Editor</h1>
       </header>
 
       <div className="search-container">
@@ -115,14 +113,14 @@ function SearchPage({ setSelectedImage }) {
                           className="action-btn"
                           onClick={() => handleImageSelect(image)}
                         >
-                          Enhance Image
+                          Add Caption
                         </button>
-                        <button
+                        {/* <button
                           className="action-btn"
                           onClick={() => downloadImage(image.largeImageURL)}
                         >
                           <FaDownload /> Download HD
-                        </button>
+                        </button> */}
                       </div>
                     </div>
                   </div>
