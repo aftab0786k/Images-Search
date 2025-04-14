@@ -64,6 +64,8 @@ function SearchPage({ setSelectedImage }) {
     <div className="search-page">
       <header className="search-header">
         <h1>Image Search & Editor</h1>
+        <p>Aftab Miyan & Email:aftabmiya579@gmail.com</p>
+      
       </header>
 
       <div className="search-container">
