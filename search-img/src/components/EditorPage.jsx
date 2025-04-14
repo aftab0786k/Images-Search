@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { fabric } from 'fabric';
-import { FaDownload, FaFont, FaRegCircle, FaRegSquare, FaRegStar } from 'react-icons/fa';
+import { FaDownload, FaFont, FaRegCircle, FaRegSquare , FaTrash } from 'react-icons/fa';
+import {  MdChangeHistory, MdOutlineLayers } from 'react-icons/md';
 import '../styles/EditorPage.css';
 
 function EditorPage({ selectedImage }) {
@@ -8,8 +9,9 @@ function EditorPage({ selectedImage }) {
     const containerRef = useRef(null);
     const [canvas, setCanvas] = useState(null);
     const [imageInstance, setImageInstance] = useState(null);
+    const [selectedObject, setSelectedObject] = useState(null);
 
-    // Canvas initialization
+    // Canvas initialization with event handlers
     useEffect(() => {
         const initCanvas = () => {
             const container = containerRef.current;
@@ -25,6 +27,34 @@ function EditorPage({ selectedImage }) {
                 selection: true,
                 backgroundColor: '#000000',
             });
+
+            // Selection handlers
+            newCanvas.on('selection:created', () => {
+                const activeObject = newCanvas.getActiveObject();
+                if (activeObject !== imageInstance) {
+                    setSelectedObject(activeObject);
+                }
+            });
+
+            newCanvas.on('selection:updated', () => {
+                const activeObject = newCanvas.getActiveObject();
+                if (activeObject !== imageInstance) {
+                    setSelectedObject(activeObject);
+                }
+            });
+
+            newCanvas.on('selection:cleared', () => {
+                setSelectedObject(null);
+            });
+
+            // Keyboard delete handler
+            const handleKeyDown = (e) => {
+                if ((e.key === 'Delete' || e.key === 'Backspace') && selectedObject) {
+                    deleteSelected();
+                }
+            };
+
+            window.addEventListener('keydown', handleKeyDown);
             
             setCanvas(newCanvas);
             return newCanvas;
@@ -49,7 +79,7 @@ function EditorPage({ selectedImage }) {
         };
     }, []);
 
-    // Image loading
+    // Image loading with protection
     useEffect(() => {
         if (canvas && selectedImage) {
             fabric.Image.fromURL(selectedImage, img => {
@@ -60,6 +90,10 @@ function EditorPage({ selectedImage }) {
                     top: canvas.height / 2,
                     selectable: false,
                     evented: false,
+                    hasControls: false,
+                    hasBorders: false,
+                    lockMovementX: true,
+                    lockMovementY: true,
                     crossOrigin: 'anonymous'
                 });
                 
@@ -71,6 +105,15 @@ function EditorPage({ selectedImage }) {
             }, { crossOrigin: 'anonymous' });
         }
     }, [canvas, selectedImage]);
+
+    // Delete functionality
+    const deleteSelected = () => {
+        if (!canvas || !selectedObject) return;
+        canvas.remove(selectedObject);
+        canvas.discardActiveObject();
+        canvas.requestRenderAll();
+        setSelectedObject(null);
+    };
 
     // Add text element
     const addText = () => {
@@ -107,14 +150,11 @@ function EditorPage({ selectedImage }) {
             left: canvas.width / 2,
             top: canvas.height / 2,
             fill: 'rgba(255,255,255,0.1)',
-            stroke: '#6d8cff',
             strokeWidth: 2,
             originX: 'center',
             originY: 'center',
             hasControls: true,
             hasBorders: true,
-            borderColor: '#6d8cff',
-            cornerColor: '#6d8cff',
             cornerSize: 12,
             transparentCorners: false,
         };
@@ -153,19 +193,31 @@ function EditorPage({ selectedImage }) {
         }
     };
 
-    // Download functionality
+    // Enhanced download functionality
     const downloadImage = () => {
         if (!canvas) return;
 
+        // Create temporary canvas with original image dimensions
         const tempCanvas = document.createElement('canvas');
         const tempCtx = tempCanvas.getContext('2d');
-        const scaleFactor = 2;
         
-        tempCanvas.width = canvas.width * scaleFactor;
-        tempCanvas.height = canvas.height * scaleFactor;
-        tempCtx.scale(scaleFactor, scaleFactor);
+        // Get original image dimensions
+        const img = imageInstance?._element;
+        const originalWidth = img?.naturalWidth || canvas.width;
+        const originalHeight = img?.naturalHeight || canvas.height;
+
+        // Set temp canvas to original image size
+        tempCanvas.width = originalWidth;
+        tempCanvas.height = originalHeight;
+
+        // Scale and draw all canvas contents
+        const scaleX = originalWidth / canvas.width;
+        const scaleY = originalHeight / canvas.height;
+        
+        tempCtx.scale(scaleX, scaleY);
         tempCtx.drawImage(canvas.lowerCanvasEl, 0, 0);
 
+        // Create download link
         const link = document.createElement('a');
         link.download = `design-${Date.now()}.png`;
         link.href = tempCanvas.toDataURL('image/png');
@@ -204,8 +256,16 @@ function EditorPage({ selectedImage }) {
                         onClick={() => addShape('triangle')} 
                         className="toolbar-btn neon-green"
                     >
-                        <FaRegStar className="toolbar-icon" />
+                        <MdChangeHistory  className="toolbar-icon" />
                         Triangle
+                    </button>
+                    <button 
+                        onClick={deleteSelected} 
+                        className="toolbar-btn delete-btn"
+                        disabled={!selectedObject}
+                    >
+                        <FaTrash className="toolbar-icon" />
+                        Delete
                     </button>
                     <button 
                         onClick={downloadImage} 
