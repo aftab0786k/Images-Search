@@ -1,0 +1,80 @@
+.editor-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .editor-container {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(5px);
+    width: 900px;
+    max-width: 100%;
+  }
+  
+  .canvas-container {
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  .canvas-container canvas {
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .toolbar {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .toolbar button {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 25px;
+    background: #4facfe;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+  }
+  
+  .toolbar button:hover {
+    background: #00f2fe;
+    transform: translateY(-2px);
+  }
+  
+  .download-icon {
+    font-size: 16px;
+  }
+  
+  @media (max-width: 850px) {
+    .editor-container {
+      padding: 10px;
+    }
+  
+    .canvas-container canvas {
+      width: 100% !important;
+      height: auto !important;
+    }
+  
+    .toolbar {
+      flex-direction: column;
+    }
+  
+    .toolbar button {
+      width: 100%;
+      padding: 10px 20px;
+    }
+  }
